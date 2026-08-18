@@ -22,12 +22,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# try:
-#     from rag_curator.ingestion.metadata import ArXivPaper, MetadataStore
-#     from rag_curator.ingestion.pdf import PdfDownloader
-# except ImportError:  # pragma: no cover - supports direct script execution
-from metadata import ArXivPaper, MetadataStore
-from pdf import PdfDownloader
+# try:  # pragma: no cover - package import path
+from rag_curator.ingestion.metadata import ArXivPaper, MetadataStore
+from rag_curator.ingestion.pdf import PdfDownloader
+# except ImportError:  # pragma: no cover - direct script execution fallback
+#     from metadata import ArXivPaper, MetadataStore
+#     from pdf import PdfDownloader
 
 
 #Configure logging
@@ -79,6 +79,13 @@ class ArXivDownloader:
         self.metadata_store = MetadataStore(self.metadata_file)
         self.papers_metadata = self.metadata_store.papers_metadata
         self.pdf_downloader = PdfDownloader(self.raw_dir, rate_limit=self.rate_limit)
+        logger.info(
+            "ArXivDownloader initialized: data_dir=%s, metadata_file=%s, raw_dir=%s, processed_dir=%s",
+            self.data_dir,
+            self.metadata_file,
+            self.raw_dir,
+            self.processed_dir,
+        )
 
     def _rate_limit(self):
         """Ensure that requests are rate-limited according to ArXiv's guidelines."""
@@ -112,6 +119,7 @@ class ArXivDownloader:
         """
 
         papers = []
+        logger.info("Searching ArXiv for query=%s, max_results=%s, sort_order=%s, sort_direction=%s", query, max_results, sort_order, sort_direction)
 
         search_query = query.strip()
         if search_query.startswith("cat:") and " cat:" not in search_query:
@@ -171,7 +179,7 @@ class ArXivDownloader:
             except Exception as e:
                 logger.error(f"Error occurred while rate limiting: {e}")
                 break
-        logger.info(f"Total papers fetched: {len(papers) + 1}")
+        logger.info("Total papers fetched: %d", len(papers))
         return papers
 
 
@@ -221,6 +229,7 @@ class ArXivDownloader:
             List of papers with updated metadata.
         """
         downloaded_papers = []
+        logger.info("Starting download for %d papers (download_pdfs=%s)", len(papers), download_pdfs)
         for i, paper in enumerate(papers, start=1):
             if paper is None:
                 continue
@@ -257,6 +266,7 @@ class ArXivDownloader:
         self.papers_metadata["papers"].extend(downloaded_papers)
         self.metadata_store.papers_metadata = self.papers_metadata
         self.metadata_store._save_metadata()
+        logger.info("Finished paper download step: %d records saved", len(self.papers_metadata["papers"]))
 
         logger.info(f"Downloaded {len(downloaded_papers)} papers and updated metadata.")
         return downloaded_papers

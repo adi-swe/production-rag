@@ -30,6 +30,7 @@ class MetadataStore:
 
     def __init__(self, metadata_path: Path):
         self.metadata_path = metadata_path
+        logger.info("Loading metadata store from %s", self.metadata_path)
         self.papers_metadata = self._load_metadata()
 
     def _load_metadata(self) -> Dict[str, List[dict]]:
@@ -38,9 +39,11 @@ class MetadataStore:
                 with open(self.metadata_path, "r", encoding="utf-8") as handle:
                     data = json.load(handle)
                     if isinstance(data, dict):
+                        logger.info("Loaded metadata with %d paper records", len(data.get("papers", [])))
                         return data
             except Exception as exc:  # pragma: no cover - defensive
                 logger.warning("Error decoding metadata file: %s", exc)
+        logger.info("No existing metadata found at %s; creating empty store", self.metadata_path)
         return {"papers": []}
 
     def _save_metadata(self):
@@ -48,6 +51,7 @@ class MetadataStore:
             self.metadata_path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.metadata_path, "w", encoding="utf-8") as handle:
                 json.dump(self.papers_metadata, handle, indent=2)
+            logger.info("Saved metadata to %s (%d papers)", self.metadata_path, len(self.papers_metadata.get("papers", [])))
         except Exception as exc:  # pragma: no cover - defensive
             logger.error("Error saving metadata to JSON file: %s", exc)
 
@@ -58,16 +62,15 @@ class MetadataStore:
         )
 
     def add_or_update(self, paper: Any):
-        existing = self.find_by_arxiv_id(
-            paper.arxiv_id if hasattr(paper, "arxiv_id") else paper.get("arxiv_id")
-        )
+        arxiv_id = paper.arxiv_id if hasattr(paper, "arxiv_id") else paper.get("arxiv_id")
+        existing = self.find_by_arxiv_id(arxiv_id)
         if existing:
             self.papers_metadata["papers"] = [
-                p for p in self.papers_metadata["papers"] if p.get("arxiv_id") != (paper.arxiv_id if hasattr(paper, "arxiv_id") else paper.get("arxiv_id"))
+                p for p in self.papers_metadata["papers"] if p.get("arxiv_id") != arxiv_id
             ]
-        self.papers_metadata["papers"].append(
-            asdict(paper) if hasattr(paper, "__dict__") else paper
-        )
+            logger.info("Replacing existing metadata record for %s", arxiv_id)
+        self.papers_metadata["papers"].append(asdict(paper) if hasattr(paper, "__dict__") else paper)
+        logger.info("Added metadata record for %s", arxiv_id)
         self._save_metadata()
 
     def export_metadata_to_csv(self, output_path: Path):
@@ -75,6 +78,7 @@ class MetadataStore:
             logger.warning("No papers metadata to export.")
             return
 
+        logger.info("Exporting %d metadata rows to %s", len(self.papers_metadata["papers"]), output_path)
         with open(output_path, "w", newline="", encoding="utf-8") as csvfile:
             writer = csv.DictWriter(
                 csvfile,
