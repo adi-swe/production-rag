@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, Boolean, Column, DateTime, String, Text
+from sqlalchemy import JSON, Boolean, Column, DateTime, String, Text, false, func
 from sqlalchemy.dialects.postgresql import UUID
 from src.db.interfaces.postgresql import Base
 
@@ -16,7 +16,7 @@ class Paper(Base):
     authors = Column(JSON, nullable=False)
     abstract = Column(Text, nullable=False)
     categories = Column(JSON, nullable=False)
-    published_date = Column(DateTime, nullable=False)
+    published_date = Column(DateTime(timezone=True), nullable=False)
     pdf_url = Column(String, nullable=False)
 
     # Parsed PDF content (added for comprehensive storage)
@@ -27,9 +27,20 @@ class Paper(Base):
     # PDF processing metadata
     parser_used = Column(String, nullable=True)
     parser_metadata = Column(JSON, nullable=True)
-    pdf_processed = Column(Boolean, default=False, nullable=False)
-    pdf_processing_date = Column(DateTime, nullable=True)
+    pdf_processed = Column(Boolean, default=False, server_default=false(), nullable=False)
+    pdf_processing_date = Column(DateTime(timezone=True), nullable=True)
 
     # Timestamps
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        server_default=func.now(),
+        nullable=False,
+    )

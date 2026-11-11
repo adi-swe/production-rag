@@ -1,7 +1,33 @@
+# Local configuration and secrets
 .env
+.env.*
+!.env.example
 
+# Python environments and generated files
+.venv/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
+# Notebook and editor artifacts
+.ipynb_checkpoints/
+.DS_Store
+.idea/
+.vscode/
 
+# Runtime data
 data/
+
+# Airflow runtime state and credentials
+airflow/logs/
+airflow/airflow.cfg
+airflow/*.db
+airflow/*.pid
+airflow/simple_auth_manager_passwords.json.generated
+airflow/standalone_admin_password.txt
