@@ -8,7 +8,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from rag_curator.ingestion.arxiv import ArXivDownloader
+from src.rag_curator.ingestion.arxiv import ArXivDownloader
 
 
 class TestArXivDownloader(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestArXivDownloader(unittest.TestCase):
             self.assertTrue(downloader.processed_dir.exists())
             self.assertIsInstance(downloader.papers_metadata, dict)
 
-    @patch("rag_curator.ingestion.arxiv.urllib.request.urlopen")
+    @patch("src.rag_curator.ingestion.arxiv.urllib.request.urlopen")
     def test_search_papers_parses_response_and_builds_valid_query(self, mock_urlopen):
         mock_urlopen.return_value.read.return_value = b"""
         <feed xmlns="http://www.w3.org/2005/Atom">

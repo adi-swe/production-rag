@@ -1,12 +1,12 @@
 import logging
 from typing import Any, Mapping, Optional
 
-from rag_curator.processing.cleaner import TextPreprocessor
-from rag_curator.processing.document import DocumentChunk
-from rag_curator.processing.strategies.fixed_size import FixedSizeChunker
-from rag_curator.processing.strategies.recursive import RecursiveChunker
-from rag_curator.processing.strategies.semantic import SemanticChunker
-from rag_curator.processing.strategies.sentence import SentenceChunker
+from .cleaner import TextPreprocessor
+from .document import DocumentChunk
+from .strategies.fixed_size import FixedSizeChunker
+from .strategies.recursive import RecursiveChunker
+from .strategies.semantic import SemanticChunker
+from .strategies.sentence import SentenceChunker
 
 
 logger = logging.getLogger("rag_curator.processing.chunker")

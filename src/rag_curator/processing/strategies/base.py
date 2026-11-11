@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from rag_curator.processing.document import Document, DocumentChunk
+from ..document import Document, DocumentChunk
 
 
 class ChunkingStrategy(ABC):

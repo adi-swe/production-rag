@@ -23,8 +23,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # try:  # pragma: no cover - package import path
-from rag_curator.ingestion.metadata import ArXivPaper, MetadataStore
-from rag_curator.ingestion.pdf import PdfDownloader
+from .metadata import ArXivPaper, MetadataStore
+from .pdf import PdfDownloader
 # except ImportError:  # pragma: no cover - direct script execution fallback
 #     from metadata import ArXivPaper, MetadataStore
 #     from pdf import PdfDownloader

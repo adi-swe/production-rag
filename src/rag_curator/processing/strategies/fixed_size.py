@@ -1,6 +1,6 @@
 import logging
 
-from rag_curator.processing.document import Document, DocumentChunk
+from ..document import Document, DocumentChunk
 from .base import ChunkingStrategy
 
 
