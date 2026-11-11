@@ -14,7 +14,7 @@ class PdfDownloader:
 
     def __init__(self, raw_dir: Path, rate_limit: float = 3.0):
         self.raw_dir = raw_dir
-        self.rate_limit = rate_limit
+        self.rate_limit = rate_limit 
         self.last_request_time = 0.0
         self.raw_dir.mkdir(parents=True, exist_ok=True)
 
